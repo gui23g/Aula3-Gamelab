@@ -21,7 +21,7 @@ var config = {
       debug: true, //ativa o modo de debug/depuracao
     },
   },
-  scene: [Maze],
+  scene: [Title, Loading, Maze, End],
 };
 
 // Instanciando o phaser
