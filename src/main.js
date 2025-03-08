@@ -11,6 +11,7 @@ var config = {
   //CONSERTAR ENQUADRAMENTO
   scale: { mode: Phaser.Scale.FIT }, //Dimensiona o conteúdo para que ele preencha a tela inteira, mantendo sua proporção
   backgroundColor: "#272036", //define a cor de fundo
+  //pixelArt: true,
   //Adicionando as classes/cenas do jogo, conforme a ordem do gameflow
   physics: {
     //ativando a fisica do jogo
