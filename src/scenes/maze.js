@@ -13,7 +13,9 @@ class Maze extends Phaser.Scene {
   aberto = false;
   talking = false;
 
-  preload() {}
+  preload() {
+
+  }
 
   create() {
     const map = this.make.tilemap({ key: "mazetilemap" });
@@ -66,7 +68,6 @@ class Maze extends Phaser.Scene {
     }
 
     if (this.player.body.velocity.y != 0 || this.player.body.velocity.x != 0) {
-      console.log("Toca animação");
       if (this.player.body.velocity.y > 0) {
         this.player.animState = "andarBaixo";
       } else if (this.player.body.velocity.y < 0) {
