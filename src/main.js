@@ -18,7 +18,7 @@ var config = {
     default: "arcade", //fisicas tipo arcade
     arcade: {
       gravity: { y: 0 }, //Retirando a gravidade do jogo
-      debug: true, //ativa o modo de debug/depuracao
+      debug: false, //ativa o modo de debug/depuracao
     },
   },
   scene: [Title, Loading, Maze, End],
