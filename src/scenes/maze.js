@@ -1,4 +1,3 @@
-// Aqui o columbini vai fazer acontecer =)
 class Maze extends Phaser.Scene {
   // Tela do labirinto
   constructor() {
@@ -9,50 +8,54 @@ class Maze extends Phaser.Scene {
   gearsCount = 0;
   portaFechada;
   portaAberta;
-  andando = false;
   aberto = false;
   talking = true;
   dialogue_box;
   dialogueText;
+  // Array com os diálogos (alternativamente, se forem muitos, use um arquivo dialogos.json e leia dele)
   dialogues = [
     "Oh não! A impressora 3D do laboratório quebrou!",
     "Por conta disso, o Andre do Lab me trancou aqui dentro do porão do Inteli!",
     "Ele disse que enquanto eu não achar todas as engranagens boas, ele não iria me soltar daqui!",
   ];
-  i = 0;
+  i = 0; // Índice de diálogo
 
-  preload() {}
+  preload() {} // Uma vez que tudo foi carregado na tela de Loading, não há nada aqui
 
   create() {
+    // Criação do tilemap:
     const map = this.make.tilemap({ key: "mazetilemap" });
 
+    // Coloque o nome do tileset dentro do Tiled e sua chave no Phaser (Recomendável usar o mesmo nome para evitar confusão)
     const tileset = map.addTilesetImage("mazetileset", "mazetileset");
-
-    // criar cada camada presente no mapa do tiled na ordem de baixo para cima
+    
+    // Cria cada camada presente no mapa do tiled na ordem de baixo para cima
     map.createStaticLayer("chao", tileset);
     const colisaoLayer = map.createStaticLayer("colisao", tileset);
-    colisaoLayer.setCollisionByProperty({ collides: true }); // todos os tiles com propriedade collides: true vao colidir nessa camada
-    //colisaoLayer.setCollisionBetween(1, 50); // método alternativo de setar colisões
     map.createStaticLayer("decoracao", tileset);
 
-    createAnimation(this, "parado", "player", 0, 3, 8, -1); // funcao gostosa dmais gui vc eh muito lindo
-    createAnimation(this, "andarBaixo", "player", 4, 7, 8, -1);
+    colisaoLayer.setCollisionByProperty({ collides: true }); // Todos os tiles com propriedade (collides: true) vao colidir nessa camada
+    // colisaoLayer.setCollisionBetween(1, 50); // Método alternativo de setar colisões por id do tile no tileset
+
+    createAnimation(this, "parado", "player", 0, 3, 8, -1); // Função customizada para simplificar criação de animações
+    createAnimation(this, "andarBaixo", "player", 4, 7, 8, -1); // Se desejar, ela está disponível em main.js
     createAnimation(this, "andarCima", "player", 8, 11, 8, -1);
     createAnimation(this, "andarDireita", "player", 12, 15, 8, -1);
     createAnimation(this, "andarEsquerda", "player", 16, 19, 8, -1);
     createAnimation(this, "engrenagemgira", "engrenagem", 0, 3, 5, -1);
 
     this.portaFechada = this.add
-      .image(width / 2, 0, "PortaFechada")
+      .image(400, 0, "PortaFechada")
       .setOrigin(0.5, 0.6);
 
-    this.player = this.physics.add.sprite(100, 100, "player");
-    this.physics.add.collider(this.player, colisaoLayer); // seta colisão do player com a camada do mapa
-    this.player.anims.play("parado");
+    this.player = this.physics.add.sprite(100, 100, "player"); // Adiciona player como sprite com propriedade de física
+    this.physics.add.collider(this.player, colisaoLayer); // Implementa colisão do player com a camada do mapa
+    this.player.animState = "parado"; // Cria variável do player de estado de animação (opcional, facilita controle das animações)
+    this.player.anims.play(this.player.animState); // Inicia animação de acordo com a variável
 
-    this.gears = this.physics.add.staticGroup();
+    this.gears = this.physics.add.staticGroup(); // Cria grupo de objetos estáticos com colisão
 
-    let engrenagemPosicoes = [
+    let engrenagemPosicoes = [ // Lista das posições das engrenagens
       [width / 2, height / 2],
       [88, 500],
       [700, 100],
@@ -64,7 +67,7 @@ class Maze extends Phaser.Scene {
       [width / 2, 500],
     ];
 
-    for (let i = 0; i < engrenagemPosicoes.length; i++) {
+    for (let i = 0; i < engrenagemPosicoes.length; i++) { // Cria iteradamente as engrenagens, sem ter que reescrever o mesmo código
       this.gears
         .create(
           engrenagemPosicoes[i][0],
@@ -74,17 +77,19 @@ class Maze extends Phaser.Scene {
         .anims.play("engrenagemgira");
     }
 
+    // Função que roda quando o player e uma engrenagem se sobrepõem
     this.physics.add.overlap(this.player, this.gears, (player, gear) => {
       this.gearsCount++;
       gear.destroy();
     });
 
+    // Adiciona caixa de diálogo e seu texto
     this.dialogue_box = this.add
-      .image(this.player.body.x, this.player.body.y + 100, "caixaDialogo")
-      .setOrigin(0.5, 0);
+      .image(width/2, height-100, "caixaDialogo")
+      .setOrigin(0.5, 0.5); // Torna ponto de origem do objeto o seu centro (o padrão é o canto superior esquerdo)
     this.dialogueText = this.add.text(
-      this.player.body.x - 220,
-      this.player.body.y + 150,
+      this.dialogue_box.x-200,
+      this.dialogue_box.y-30,
       this.dialogues[this.i],
       {
         fontFamily: '"Press Start 2P"', // Fonte utilizada (ATENÇÃO: Essa fonte só existe porque foram carregadas fontes no html)
@@ -95,17 +100,18 @@ class Maze extends Phaser.Scene {
         wordWrap: { width: 550 }, // Tamanho para a quebra do texto
       }
     );
+    this.dialogueText.setScrollFactor(0,0); // Faz com que a caixa de diálogo acompanhe a camera
+    this.dialogue_box.setScrollFactor(0,0); // Essa função pode ser usada para efeito paralaxe também
 
+    this.cameras.addExisting(this.cameras.main); // Adiciona a câmera principal à cena (o jogo automaticamente acompanhará ela)
+    this.cameras.main.startFollow(this.player); // Faz com que a câmera siga o jogador
     this.cameras.main.zoom = 1;
-    this.cameras.addExisting(this.cameras.main);
-    this.cameras.main.startFollow(this.player);
-    this.player.animState = "idle";
 
     if (this.talking) {
       this.input.on("pointerdown", () => {
         if (this.i < this.dialogues.length - 1) {
           this.i++;
-          this.dialogueText.setText(this.dialogues[this.i]);
+          this.dialogueText.setText(this.dialogues[this.i]); // Exibe texto de acordo com índice do diálogo atual
         } else {
           this.dialogue_box.destroy();
           this.dialogueText.destroy();
@@ -130,7 +136,6 @@ class Maze extends Phaser.Scene {
       } else {
         this.player.animState = "andarDireita";
       }
-      this.andando = true;
     } else {
       this.player.animState = "parado";
     }
@@ -141,7 +146,7 @@ class Maze extends Phaser.Scene {
         .sprite(width / 2, 0, "PortaAberta")
         .setOrigin(0.5, 0.6);
       this.physics.add.overlap(this.player, this.portaAberta, () => {
-        this.scene.start("End");
+        this.scene.start("End"); // Quando player sobrepõe porta aberta, troca para cena "End"
       });
       this.aberto = true;
     }
@@ -157,8 +162,8 @@ class Maze extends Phaser.Scene {
       );
     }
 
-    if (this.player.anims.currentAnim != this.player.animState) {
-      this.player.anims.play(this.player.animState, true);
-    }
+    // Ao final da lógica principal, a animação do player é atualizada de acordo com a variável
+    // Isso evita que mais de uma animação seja iniciada no mesmo frame, o que causaria bugs visuais
+    this.player.anims.play(this.player.animState, true); // ignoreIfPlaying? = true; Ignora se essa animação já estiver tocando
   }
 }
