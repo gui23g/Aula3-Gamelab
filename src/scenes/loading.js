@@ -25,7 +25,7 @@ class Loading extends Phaser.Scene {
       frameHeight: 32,
     });
 
-    this.load.image("PortaAberta", "assets/portaAberta.jpg")
+    this.load.image("PortaAberta", "assets/portaAberta.png")
     this.load.image("PortaFechada", "assets/portaFechada.png")
   }
 

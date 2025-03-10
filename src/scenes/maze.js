@@ -11,7 +11,7 @@ class Maze extends Phaser.Scene {
   portaAberta;
   andando = false;
   aberto = false;
-  talking = true;
+  talking = false;
 
   preload() {}
 
@@ -36,8 +36,7 @@ class Maze extends Phaser.Scene {
 
     this.portaFechada = this.add
       .image(width / 2, 0, "PortaFechada")
-      .setScale(0.1)
-      .setOrigin(0.5, 0);
+      .setOrigin(0.5, 0.6);
 
     this.player = this.physics.add.sprite(100, 100, "player");
     this.physics.add.collider(this.player, colisaoLayer); // seta colisão do player com a camada do mapa
@@ -86,8 +85,7 @@ class Maze extends Phaser.Scene {
       this.portaFechada.destroy();
       this.portaAberta = this.physics.add
         .sprite(width / 2, 0, "PortaAberta")
-        .setScale(0.1)
-        .setOrigin(0.5, 0);
+        .setOrigin(0.5, 0.6);
       this.physics.add.overlap(this.player, this.portaAberta, () => {
         this.scene.start("End");
       });
