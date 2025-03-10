@@ -11,11 +11,17 @@ class Maze extends Phaser.Scene {
   portaAberta;
   andando = false;
   aberto = false;
-  talking = false;
+  talking = true;
+  dialogue_box;
+  dialogueText;
+  dialogues = [
+    "Oh não! A impressora 3D do laboratório quebrou!",
+    "Por conta disso, o Andre do Lab me trancou aqui dentro do porão do Inteli!",
+    "Ele disse que enquanto eu não achar todas as engranagens boas, ele não iria me soltar daqui!",
+  ];
+  i = 0;
 
-  preload() {
-
-  }
+  preload() {}
 
   create() {
     const map = this.make.tilemap({ key: "mazetilemap" });
@@ -46,25 +52,72 @@ class Maze extends Phaser.Scene {
 
     this.gears = this.physics.add.staticGroup();
 
-    let engrenagemPosicoes = [[width / 2, height / 2], [88, 500], [700, 100], [300, 261], [700, 500], [600, 90], [80, 400], [290, 146], [width / 2, 500]]
+    let engrenagemPosicoes = [
+      [width / 2, height / 2],
+      [88, 500],
+      [700, 100],
+      [300, 261],
+      [700, 500],
+      [600, 90],
+      [80, 400],
+      [290, 146],
+      [width / 2, 500],
+    ];
 
     for (let i = 0; i < engrenagemPosicoes.length; i++) {
-      this.gears.create(engrenagemPosicoes[i][0], engrenagemPosicoes[i][1], "engrenagem").anims.play('engrenagemgira');
+      this.gears
+        .create(
+          engrenagemPosicoes[i][0],
+          engrenagemPosicoes[i][1],
+          "engrenagem"
+        )
+        .anims.play("engrenagemgira");
     }
 
     this.physics.add.overlap(this.player, this.gears, (player, gear) => {
       this.gearsCount++;
       gear.destroy();
     });
-    this.cameras.main.zoom = 1
+
+    this.dialogue_box = this.add
+      .image(this.player.body.x, this.player.body.y + 100, "caixaDialogo")
+      .setOrigin(0.5, 0);
+    this.dialogueText = this.add.text(
+      this.player.body.x - 220,
+      this.player.body.y + 150,
+      this.dialogues[this.i],
+      {
+        fontFamily: '"Press Start 2P"', // Fonte utilizada (ATENÇÃO: Essa fonte só existe porque foram carregadas fontes no html)
+        resolution: 5, // Resolução da fonte
+        fontSize: "15px", // Tamanho da fonte
+        fill: "#FFFFFF", // Cor da fonte
+        align: "left", // Alinhamento do texto
+        wordWrap: { width: 550 }, // Tamanho para a quebra do texto
+      }
+    );
+
+    this.cameras.main.zoom = 1;
     this.cameras.addExisting(this.cameras.main);
     this.cameras.main.startFollow(this.player);
     this.player.animState = "idle";
+
+    if (this.talking) {
+      this.input.on("pointerdown", () => {
+        if (this.i < this.dialogues.length - 1) {
+          this.i++;
+          this.dialogueText.setText(this.dialogues[this.i]);
+        } else {
+          this.dialogue_box.destroy();
+          this.dialogueText.destroy();
+          this.talking = false;
+        }
+      });
+    }
   }
 
   update() {
     if (!this.talking) {
-        moveChar(this, 200, 200, this.player); // economizei 3929832999 linhas de codigo aq tmj
+      moveChar(this, 200, 200, this.player); // economizei 3929832999 linhas de codigo aq tmj
     }
 
     if (this.player.body.velocity.y != 0 || this.player.body.velocity.x != 0) {
@@ -75,11 +128,11 @@ class Maze extends Phaser.Scene {
       } else if (this.player.body.velocity.x < 0) {
         this.player.animState = "andarEsquerda";
       } else {
-        this.player.animState = "andarDireita"
+        this.player.animState = "andarDireita";
       }
       this.andando = true;
     } else {
-        this.player.animState = "parado";
+      this.player.animState = "parado";
     }
 
     if (this.gearsCount == 9 && !this.aberto) {
@@ -92,8 +145,16 @@ class Maze extends Phaser.Scene {
       });
       this.aberto = true;
     }
-    if (!this.player.body.blocked.left && !this.player.body.blocked.right && !this.player.body.blocked.up && !this.player.body.blocked.down) {
-      this.player.setPosition(Math.round(this.player.x), Math.round(this.player.y))
+    if (
+      !this.player.body.blocked.left &&
+      !this.player.body.blocked.right &&
+      !this.player.body.blocked.up &&
+      !this.player.body.blocked.down
+    ) {
+      this.player.setPosition(
+        Math.round(this.player.x),
+        Math.round(this.player.y)
+      );
     }
 
     if (this.player.anims.currentAnim != this.player.animState) {

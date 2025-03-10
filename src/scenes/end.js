@@ -10,7 +10,7 @@ class End extends Phaser.Scene {
       .text(
         width / 2,
         height / 2,
-        "Parabéns! Você conseguiu coletar todos, você é tipo, incrível!",
+        "Parabéns! Você conseguiu coletar todas!!! Você é tipo, incrível!",
         {
           fontFamily: '"Press Start 2P"', // Fonte utilizada (ATENÇÃO: Essa fonte só existe porque foram carregadas fontes no html)
           resolution: 5, // Resolução da fonte
