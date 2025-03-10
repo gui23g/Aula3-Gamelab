@@ -27,6 +27,7 @@ class Loading extends Phaser.Scene {
 
     this.load.image("PortaAberta", "assets/portaAberta.png")
     this.load.image("PortaFechada", "assets/portaFechada.png")
+    this.load.image("caixaDialogo", "assets/caixadialogo.png")
 
     this.load.image('victory1', 'assets/victory1.png')
     this.load.image('victory2', 'assets/victory2.png')
