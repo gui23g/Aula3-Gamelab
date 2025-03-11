@@ -4,6 +4,7 @@ class Maze extends Phaser.Scene {
     super({ key: "Maze" });
   }
 
+  // Variaveis
   gears;
   gearsCount = 0;
   portaFechada;
@@ -12,6 +13,7 @@ class Maze extends Phaser.Scene {
   talking = true;
   dialogue_box;
   dialogueText;
+
   // Array com os diálogos (alternativamente, se forem muitos, use um arquivo dialogos.json e leia dele)
   dialogues = [
     "Oh não! A impressora 3D do laboratório quebrou!",
@@ -20,7 +22,7 @@ class Maze extends Phaser.Scene {
   ];
   i = 0; // Índice de diálogo
 
-  preload() {} // Uma vez que tudo foi carregado na tela de Loading, não há nada aqui
+  preload() {} // Uma vez que tudo foi carregado na tela de Loading, não há nada aqui =)
 
   create() {
     // Criação do tilemap:
@@ -28,7 +30,7 @@ class Maze extends Phaser.Scene {
 
     // Coloque o nome do tileset dentro do Tiled e sua chave no Phaser (Recomendável usar o mesmo nome para evitar confusão)
     const tileset = map.addTilesetImage("mazetileset", "mazetileset");
-    
+
     // Cria cada camada presente no mapa do tiled na ordem de baixo para cima
     map.createStaticLayer("chao", tileset);
     const colisaoLayer = map.createStaticLayer("colisao", tileset);
@@ -55,7 +57,8 @@ class Maze extends Phaser.Scene {
 
     this.gears = this.physics.add.staticGroup(); // Cria grupo de objetos estáticos com colisão
 
-    let engrenagemPosicoes = [ // Lista das posições das engrenagens
+    let engrenagemPosicoes = [
+      // Lista das posições das engrenagens
       [width / 2, height / 2],
       [88, 500],
       [700, 100],
@@ -67,7 +70,8 @@ class Maze extends Phaser.Scene {
       [width / 2, 500],
     ];
 
-    for (let i = 0; i < engrenagemPosicoes.length; i++) { // Cria iteradamente as engrenagens, sem ter que reescrever o mesmo código
+    for (let i = 0; i < engrenagemPosicoes.length; i++) {
+      // Cria iteradamente as engrenagens, sem ter que reescrever o mesmo código
       this.gears
         .create(
           engrenagemPosicoes[i][0],
@@ -85,11 +89,11 @@ class Maze extends Phaser.Scene {
 
     // Adiciona caixa de diálogo e seu texto
     this.dialogue_box = this.add
-      .image(width/2, height-100, "caixaDialogo")
+      .image(width / 2, height - 100, "caixaDialogo")
       .setOrigin(0.5, 0.5); // Torna ponto de origem do objeto o seu centro (o padrão é o canto superior esquerdo)
     this.dialogueText = this.add.text(
-      this.dialogue_box.x-200,
-      this.dialogue_box.y-30,
+      this.dialogue_box.x - 200,
+      this.dialogue_box.y - 30,
       this.dialogues[this.i],
       {
         fontFamily: '"Press Start 2P"', // Fonte utilizada (ATENÇÃO: Essa fonte só existe porque foram carregadas fontes no html)
@@ -100,8 +104,8 @@ class Maze extends Phaser.Scene {
         wordWrap: { width: 550 }, // Tamanho para a quebra do texto
       }
     );
-    this.dialogueText.setScrollFactor(0,0); // Faz com que a caixa de diálogo acompanhe a camera
-    this.dialogue_box.setScrollFactor(0,0); // Essa função pode ser usada para efeito paralaxe também
+    this.dialogueText.setScrollFactor(0, 0); // Faz com que a caixa de diálogo acompanhe a camera
+    this.dialogue_box.setScrollFactor(0, 0); // Essa função pode ser usada para efeito paralaxe também
 
     this.cameras.addExisting(this.cameras.main); // Adiciona a câmera principal à cena (o jogo automaticamente acompanhará ela)
     this.cameras.main.startFollow(this.player); // Faz com que a câmera siga o jogador
@@ -150,17 +154,21 @@ class Maze extends Phaser.Scene {
       });
       this.aberto = true;
     }
-    if (
-      !this.player.body.blocked.left &&
-      !this.player.body.blocked.right &&
-      !this.player.body.blocked.up &&
-      !this.player.body.blocked.down
-    ) {
-      this.player.setPosition(
-        Math.round(this.player.x),
-        Math.round(this.player.y)
-      );
-    }
+// Verifica se o jogador não está bloqueado em nenhuma direção  
+// Isso garante que o jogador fique sempre bem posicionado na tela quando não estiver colidindo com objetos.
+if (
+  !this.player.body.blocked.left &&  // Não bloqueado à esquerda
+  !this.player.body.blocked.right && // Não bloqueado à direita
+  !this.player.body.blocked.up &&    // Não bloqueado acima
+  !this.player.body.blocked.down     // Não bloqueado abaixo
+) {
+  // Arredonda a posição do jogador para evitar desalinhamento com a grade  
+  this.player.setPosition(
+    Math.round(this.player.x), // Arredonda a posição X
+    Math.round(this.player.y)  // Arredonda a posição Y
+  );
+}
+
 
     // Ao final da lógica principal, a animação do player é atualizada de acordo com a variável
     // Isso evita que mais de uma animação seja iniciada no mesmo frame, o que causaria bugs visuais
