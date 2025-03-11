@@ -32,9 +32,9 @@ class Maze extends Phaser.Scene {
     const tileset = map.addTilesetImage("mazetileset", "mazetileset");
 
     // Cria cada camada presente no mapa do tiled na ordem de baixo para cima
-    map.createStaticLayer("chao", tileset);
-    const colisaoLayer = map.createStaticLayer("colisao", tileset);
-    map.createStaticLayer("decoracao", tileset);
+    map.createLayer("chao", tileset);
+    const colisaoLayer = map.createLayer("colisao", tileset);
+    map.createLayer("decoracao", tileset);
 
     colisaoLayer.setCollisionByProperty({ collides: true }); // Todos os tiles com propriedade (collides: true) vao colidir nessa camada
     // colisaoLayer.setCollisionBetween(1, 50); // Método alternativo de setar colisões por id do tile no tileset
@@ -127,7 +127,7 @@ class Maze extends Phaser.Scene {
 
   update() {
     if (!this.talking) {
-      moveChar(this, 200, 200, this.player); // economizei 3929832999 linhas de codigo aq tmj
+      moveChar(this, 200, 200, this.player); // Função disponível em main.js
     }
 
     if (this.player.body.velocity.y != 0 || this.player.body.velocity.x != 0) {
